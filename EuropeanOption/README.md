@@ -1,5 +1,31 @@
 # European Option Pricing App
 
+Based on https://github.com/just-krivi/option-pricing-models
+## Description
+
+This project aims to calculate a European option price. 
+A European option is a financial derivative that **can only be exercised on its expiration date**, not before.
+
+Example:
+Suppose you buy a European call option on a stock with a **strike price of $100** and an **expiration date of June 30**.
+
+* If the stock price is above $100 on June 30, you can exercise the option and buy the stock at $100.
+* If the stock price is below $100 on June 30, the option expires worthless.
+
+You cannot exercise the option before June 30, regardless of how high the stock price goes earlier.
+
+## Objectives
+
+- Implement and understand the theoretical foundations of European option pricing.
+- Price European call and put options using three different approaches:
+  - Black–Scholes model
+  - Monte Carlo simulation
+  - Binomial tree model
+- Compare the results obtained by each method and analyze their convergence and accuracy.
+- Study the impact of key parameters (volatility, time to maturity, interest rate) on option prices.
+- Validate numerical methods by benchmarking them against the Black–Scholes model.
+
+## App Overview
 App to price European call/put options with Black-Scholes using historical volatility from Yahoo Finance. Includes a Streamlit UI and a small CLI example.
 
 ![Streamlit demo](europeanOption.gif)
