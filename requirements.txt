@@ -6,3 +6,4 @@ matplotlib
 requests
 dotenv
 yfinance
+streamlit
