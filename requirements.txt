@@ -8,3 +8,4 @@ dotenv
 yfinance
 streamlit
 scikit-learn
+imblearn
