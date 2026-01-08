@@ -14,3 +14,5 @@ TODO: add description and screenshot
 ## Credict Score Model
 TODO: add description and screenshot
 
+(for xgboos used un 02 Churn Predictor, if you are a MAC user you may need to install `brew install libomp`)
+

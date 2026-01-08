@@ -9,3 +9,4 @@ yfinance
 streamlit
 scikit-learn
 imblearn
+xgboost
