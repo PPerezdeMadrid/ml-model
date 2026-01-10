@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 
 from model.blackscholes import BlackScholes
 from model.montecarlo import montecarlo_simulation_european_option
+from model.binomialtree import binomial_tree_option_price
 from data import rolling_hist_vol
 from option_worthiness import assess_worthiness
 
@@ -24,7 +25,7 @@ st.caption("Sigma from rolling historical volatility (log returns).")
 st.sidebar.header("Pricing method")
 pricing_method = st.sidebar.selectbox(
     "Method",
-    ["Black-Scholes", "Monte Carlo", "Binomial Tree (coming soon)"],
+    ["Black-Scholes", "Monte Carlo", "Binomial Tree"],
     index=0
 )
 n_simulations = None
@@ -36,6 +37,22 @@ if pricing_method.startswith("Monte Carlo"):
         value=200000,
         step=10000,
         help="More simulations increase stability but take longer."
+    )
+binomial_steps = None
+american = False
+if pricing_method == "Binomial Tree":
+    binomial_steps = st.sidebar.number_input(
+        "Binomial steps (N)",
+        min_value=10,
+        max_value=2000,
+        value=200,
+        step=10,
+        help="More steps approximate continuous time better."
+    )
+    american = st.sidebar.checkbox(
+        "American style (early exercise)",
+        value=False,
+        help="Enable early exercise for American options."
     )
 
 st.sidebar.header("Market data")
@@ -129,6 +146,19 @@ def run_pricing():
     if pricing_method == "Black-Scholes":
         bs = BlackScholes(S=S, K=K, T=T, r=r, sigma=sigma, option_type=option_type, q=q)
         price = bs.price()
+    elif pricing_method == "Binomial Tree":
+        steps = int(binomial_steps) if binomial_steps is not None else 200
+        price = binomial_tree_option_price(
+            S=S,
+            K=K,
+            T=T,
+            r=r,
+            sigma=sigma,
+            option_type=option_type,
+            q=q,
+            N=steps,
+            american=bool(american),
+        )
     elif pricing_method.startswith("Monte Carlo"):
         sims = int(n_simulations) if n_simulations is not None else 200000
         price = montecarlo_simulation_european_option(
@@ -172,6 +202,9 @@ def run_pricing():
     }
     if n_simulations is not None:
         inputs["inputs"]["n_simulations"] = int(n_simulations)
+    if binomial_steps is not None:
+        inputs["inputs"]["binomial_steps"] = int(binomial_steps)
+        inputs["inputs"]["american"] = bool(american)
 
     return inputs
 
