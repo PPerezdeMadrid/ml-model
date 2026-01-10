@@ -14,6 +14,7 @@ Bank customer churn classification on the BankChurners dataset (Kaggle, Thomas K
 - 02_Data_Preprocessing_Churn_predictor.ipynb: pipeline order clarifications, train/test split, one-hot encoding, SMOTE upsampling, scaling, optional PCA retaining 95 percent variance.
 - 02_Model_Churn_predictor.ipynb: cross-validation comparing Logistic Regression, Random Forest, Gradient Boosting, and XGBoost on the SMOTE + PCA set.
 - 02_Results_Churn_predictor.ipynb: holdout and imbalance-aware evaluation, classification reports, ROC-AUC, confusion matrices.
+- 02_Improvements_Churn_predictor.ipynb: threshold tuning to balance precision and recall; reducing SMOTE ratio to limit over-sensitisation to the minority class.
 
 ## Modeling pipeline
 - Split: approx 80/20 (train 8,101; test 2,026).

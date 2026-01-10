@@ -1,6 +1,8 @@
 # Machine Learning projects
 
-Collection of small ML/analytics projects. Additional notes live in this [Word document](https://1drv.ms/w/c/10af51fc8c522edd/IQDRqUdJRGfOQbgFIDqMBxqzAehoQYSlhuED0ui4cX1E0uE).
+Collection of small ML/analytics projects. 
+
+Additional notes live in this [Word document](https://1drv.ms/w/c/10af51fc8c522edd/IQDRqUdJRGfOQbgFIDqMBxqzAehoQYSlhuED0ui4cX1E0uE).
 
 ## Repo at a glance
 - `EuropeanOption/`: Streamlit + CLI app to price European call/put options with Black-Scholes (historical sigma from Yahoo Finance).
