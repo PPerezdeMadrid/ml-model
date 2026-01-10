@@ -4,7 +4,9 @@ import yfinance as yf
 import matplotlib.pyplot as plt
 
 from model.blackscholes import BlackScholes
+from model.montecarlo import montecarlo_simulation_european_option
 from data import rolling_hist_vol
+from option_worthiness import assess_worthiness
 
 
 def get_spot_price(ticker: str) -> float:
@@ -22,9 +24,19 @@ st.caption("Sigma from rolling historical volatility (log returns).")
 st.sidebar.header("Pricing method")
 pricing_method = st.sidebar.selectbox(
     "Method",
-    ["Black-Scholes", "Monte Carlo (coming soon)", "Binomial Tree (coming soon)"],
+    ["Black-Scholes", "Monte Carlo", "Binomial Tree (coming soon)"],
     index=0
 )
+n_simulations = None
+if pricing_method.startswith("Monte Carlo"):
+    n_simulations = st.sidebar.number_input(
+        "Monte Carlo simulations",
+        min_value=1000,
+        max_value=2000000,
+        value=200000,
+        step=10000,
+        help="More simulations increase stability but take longer."
+    )
 
 st.sidebar.header("Market data")
 ticker = st.sidebar.text_input("Ticker", value="AAPL")
@@ -53,6 +65,25 @@ sigma_choice = st.sidebar.radio(
 manual_sigma = None
 if sigma_choice == "Manual sigma":
     manual_sigma = st.sidebar.number_input("Sigma (annual, decimal)", value=0.25, step=0.01, format="%.4f")
+
+st.sidebar.header("Worthiness settings")
+min_time_value_ratio = st.sidebar.number_input(
+    "Min time-value share (decimal)",
+    min_value=0.0,
+    max_value=1.0,
+    value=0.10,
+    step=0.01,
+    format="%.2f",
+    help="Fraction of premium that should be time value."
+)
+min_time_value_abs = st.sidebar.number_input(
+    "Min time-value absolute",
+    min_value=0.0,
+    value=0.0,
+    step=0.05,
+    format="%.4f",
+    help="Minimum time value in absolute terms."
+)
 
 # ✅ Button
 calculate = st.sidebar.button("Calculate", type="primary")
@@ -99,17 +130,31 @@ def run_pricing():
         bs = BlackScholes(S=S, K=K, T=T, r=r, sigma=sigma, option_type=option_type, q=q)
         price = bs.price()
     elif pricing_method.startswith("Monte Carlo"):
-        # placeholder for future implementation
-        raise NotImplementedError("Monte Carlo pricing not implemented yet.")
+        sims = int(n_simulations) if n_simulations is not None else 200000
+        price = montecarlo_simulation_european_option(
+            S=S, K=K, T=T, r=r, sigma=sigma, option_type=option_type, q=q,
+            n_simulations=sims,
+            seed=42
+        )
     else:
         raise NotImplementedError("Binomial Tree pricing not implemented yet.")
 
-    return {
+    worthiness = assess_worthiness(
+        S=S,
+        K=K,
+        premium=price,
+        option_type=option_type,
+        min_time_value_ratio=float(min_time_value_ratio),
+        min_time_value_abs=float(min_time_value_abs),
+    )
+
+    inputs = {
         "S": S,
         "roll": roll,
         "sigma": sigma,
         "sigma_msg": sigma_msg,
         "price": price,
+        "worthiness": worthiness,
         "inputs": {
             "ticker": ticker,
             "method": pricing_method,
@@ -121,8 +166,14 @@ def run_pricing():
             "sigma": float(sigma),
             "window": int(window),
             "period": period,
+            "min_time_value_ratio": float(min_time_value_ratio),
+            "min_time_value_abs": float(min_time_value_abs),
         },
     }
+    if n_simulations is not None:
+        inputs["inputs"]["n_simulations"] = int(n_simulations)
+
+    return inputs
 
 
 # Only compute when button pressed (or if we already have results)
@@ -155,6 +206,21 @@ if "result" in st.session_state:
 
     st.subheader("Option price")
     st.metric(label=f"{res['inputs']['method']} — {res['inputs']['type'].upper()} price", value=f"{res['price']:.4f}")
+
+    st.subheader("Option worthiness")
+    w = res.get("worthiness")
+    if w:
+        verdict = "Worth it" if w["worth_it"] else "Mostly intrinsic value"
+        st.metric("Verdict", verdict)
+        st.write({
+            "Intrinsic value": round(w["intrinsic_value"], 4),
+            "Time value": round(w["time_value"], 4),
+            "Time value share": f"{w['time_value_ratio']:.1%}",
+            "Intrinsic share": f"{w['intrinsic_ratio']:.1%}",
+            "Min time-value share": f"{w['inputs']['min_time_value_ratio']:.0%}",
+            "Min time-value abs": round(w['inputs']['min_time_value_abs'], 4),
+        })
+        st.info(w["explanation"])
 
     st.subheader("Inputs used")
     st.write(res["inputs"])
