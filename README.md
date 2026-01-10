@@ -34,7 +34,7 @@ pip install -r requirements.txt
 ### Churn Predictor Model
 - Binary classification of bank customer churn; uses one-hot encoding, SMOTE, scaling, optional PCA, and compares Logistic Regression, Random Forest, Gradient Boosting, and XGBoost.
 - Notebooks in `ChurnPredictor/` document EDA, preprocessing, modeling, and results. Recommended order: EDA → Data Preprocessing → Model → Results.
-- Data is local (`data/BankChurners.csv`); no downloads required. Summary metrics (SMOTE + PCA): ROC-AUC ~0.98 with Random Forest; test accuracy ~0.80.
+- Data is local (`data/BankChurners.csv`); no downloads required. Summary metrics (SMOTE + PCA): ROC-AUC Random Forest 0.97, Recall 0.97, Precision 0.53 on original imbalanced data. See `ChurnPredictor/README.md` for full details.
 
 ### Credit Score Model
 - Placeholder; add description, data source, and results when available.
