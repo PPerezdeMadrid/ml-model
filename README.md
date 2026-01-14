@@ -37,7 +37,10 @@ pip install -r requirements.txt
 - Data is local (`data/BankChurners.csv`); no downloads required. Summary metrics (SMOTE + PCA): ROC-AUC Random Forest 0.97, Recall 0.97, Precision 0.53 on original imbalanced data. See `ChurnPredictor/README.md` for full details.
 
 ### Credit Score Model
-- Placeholder; add description, data source, and results when available.
+- Credit risk PD modeling on consumer loans (`CreditScore/loans_full_schema.csv`); filtered to final outcomes (Fully Paid vs Charged Off) → 454 loans with ~1.54% defaults, so evaluation focuses on minority-class metrics rather than accuracy.
+- EDA highlights: income mostly 0–50k, DTI 0–50; defaults rare across numerics but higher for borrowers with mortgages, tax liens (~14% vs ~1.35% when absent), and housing-related loan purposes. Rare-event nature makes calibration and threshold tuning critical.
+- Feature selection keeps application-time, interpretable variables: `annual_income`, `debt_to_income`, `homeownership`, `emp_length`, `verified_income`, `earliest_credit_line`, `total_credit_lines`, `open_credit_lines`, `months_since_last_delinq`, `public_record_bankrupt`, `tax_liens`, `loan_amount`, `loan_purpose`, `application_type`; excludes sparse/unstable delinquency counters (`num_historical_failed_to_pay`, `delinq_2yr`, `months_since_90d_late`).
+- Next steps (in progress): outlier treatment, scaling/encoding, logistic regression with class weighting + calibration, SHAP explainability, and portfolio simulation. See `CreditScore/03_EDA_Credit_Score.ipynb` and `CreditScore/03_Feature_Selection.ipynb`.
 
 ## Roadmap / ideas
 - Deepen the European options project: data exploration, Black–Scholes, Monte Carlo, and Binomial tree implementations; benchmark and compare parameter sensitivity.
